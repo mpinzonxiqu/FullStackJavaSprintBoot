@@ -1,15 +1,9 @@
 package com.FullStack.FullStackJavaSprintBoot.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "productos")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Producto {
 
     @Id
@@ -20,9 +14,15 @@ public class Producto {
     private String nombre;
 
     @Column(nullable = false)
-    private BigDecimal precio;
-
     private String descripcion;
+
+    @Column(nullable = false)
+    private Double precio;
+
+    // Constructor vacío obligatorio
+    public Producto() {}
+
+    // Getters y setters
 
     public Long getId() {
         return id;
@@ -40,19 +40,19 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public BigDecimal getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
-    }
-
     public String getDescripcion() {
         return descripcion;
     }
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public Double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(Double precio) {
+        this.precio = precio;
     }
 }
