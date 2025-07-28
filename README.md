@@ -7,6 +7,33 @@ Este proyecto consiste en dos microservicios desacoplados (Productos e Inventari
 
                   Arquitectura del Proyecto
 
+
+src
+└── main
+└── java
+└── com
+└── FullStack
+└── FullStackJavaSprintBoot
+├── FullStackJavaSprintBootApplication.java
+├── controller
+│   ├── ProductoController.java
+│   └── InventoryController.java
+├── dto
+│   ├── CompraRequest.java
+│   ├── CompraResponse.java
+│   ├── UpdateCantidadRequest.java
+│   └── CrearInventarioRequest.java
+├── model
+│   ├── Producto.java
+│   └── Inventory.java
+├── repository
+│   ├── ProductoRepository.java
+│   └── InventoryRepository.java
+└── service
+├── ProductoService.java
+└── InventoryService.java
+
+
 Microservicio Productos
 Expone endpoints para crear, obtener y listar productos.
 
@@ -50,10 +77,17 @@ git clone https://github.com/mpinzonxiqu/FullStackJavaSprintBoot.git
 
 Acceso a las APIs
 
-Productos: http://localhost:8081/api/products
+Productos: http://localhost:8080/api/productos
 
-Inventario: http://localhost:8082/api/inventory
+Inventario: http://localhost:8080/api/inventory/crear
 
+
+compra : http://localhost:8080/api/inventory/purchase
+
+
+Listado Productos : http://localhost:8080/api/productos
+
+Listado Productos ID: http://localhost:8080/api/productos/1
 
 
    Endpoints
@@ -113,10 +147,7 @@ JSON:API fue usado para mantener consistencia y facilitar interoperabilidad.
 
 Swagger UI habilitado por defecto en:
 
-http://localhost:8081/swagger-ui.html (Productos)
-
-
-http://localhost:8082/swagger-ui.html (Inventario)
+http://localhost:8080/swagger-ui/index.html
 
 También se incluye una colección de Postman en docs/postman_collection.json.
 
