@@ -44,4 +44,8 @@ public class ProductoService {
         }
         return false;
     }
+    public List<Producto> listar() {
+        return productoRepository.findAll();
+    }
+
 }
