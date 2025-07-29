@@ -1,157 +1,201 @@
- Prueba Técnica Backend - Microservicios de Productos e Inventario
 
 
+ Prueba Técnica Backend - Microservicios de Productos e Inventario (Versión Senior)
  Descripción General
 
-Este proyecto consiste en dos microservicios desacoplados (Productos e Inventario) desarrollados en Java con Spring Boot, que se comunican vía HTTP utilizando el estándar JSON:API. Se implementan funcionalidades para la creación de productos, gestión de inventario y un flujo de compra con validaciones de disponibilidad y consistencia de datos entre servicios.
-
-                  Arquitectura del Proyecto
 
 
-src
-└── main
-└── java
-└── com
-└── FullStack
-└── FullStackJavaSprintBoot
+[Cliente (Postman o Swagger)]
+↓
+[API Gateway futuro opcional]
+↓
+┌──────────────┐         ┌──────────────────┐
+│  Productos   │ <--→--→ │   Inventario     │
+│   GET/POST   │         │ GET/PUT/POST     │
+└──────────────┘         └──────────────────┘
+↓                        ↓
+
+Base H2                 Base H2
+Este proyecto consiste en dos microservicios desacoplados (Productos e Inventario) desarrollados en Java con Spring Boot 3, que se comunican vía HTTP utilizando el estándar JSON:API.
+Se ha implementado un flujo de compra con validaciones de stock y consistencia entre servicios.
+
+
+
+🧱 Arquitectura del Proyecto
+
+
+src/main/java/com/FullStack/FullStackJavaSprintBoot
 ├── FullStackJavaSprintBootApplication.java
-├── controller
+├── controller/
 │   ├── ProductoController.java
 │   └── InventoryController.java
-├── dto
+├── dto/
 │   ├── CompraRequest.java
 │   ├── CompraResponse.java
 │   ├── UpdateCantidadRequest.java
 │   └── CrearInventarioRequest.java
-├── model
+├── model/
 │   ├── Producto.java
 │   └── Inventory.java
-├── repository
+├── repository/
 │   ├── ProductoRepository.java
 │   └── InventoryRepository.java
-└── service
-├── ProductoService.java
-└── InventoryService.java
+├── service/
+│   ├── ProductoService.java
+│   └── InventoryService.java
+└── config/
+├── AuthInterceptor.java
+└── WebConfig.java
 
 
-Microservicio Productos
-Expone endpoints para crear, obtener y listar productos.
 
-Microservicio Inventario
+🔒 Seguridad Entre Servicios (API Key)
+Los microservicios usan una API Key para autenticarse entre sí, incluida como cabecera X-API-KEY.
+Esto protege la comunicación interna, evitando accesos externos no autorizados.
 
-Administra las cantidades disponibles, expone un endpoint para realizar compras y actualiza el inventario.
+ Se define en application.properties:
 
-
-Comunicación entre servicios
-
-Los servicios interactúan mediante REST API bajo el formato JSON:API, y la autenticación se realiza mediante API Key incluida en las cabeceras.
+properties
 
 
-Tecnologías Utilizadas
 
-Descripción
+internal.api.key=miclave-supersecreta-123
+🔐 Las llamadas internas usan esta cabecera:
 
--Java 17	Lenguaje de programación principal
+http
+
+
+X-API-KEY: miclave-supersecreta-123
+
+
+                          Tecnologías Utilizadas
+
+Tecnología	Descripción
+
+
+-Java 17	Lenguaje principal
 -Spring Boot 3	Framework para microservicios
--Spring Web	Manejo de endpoints REST
--Spring Data JPA	Persistencia con H2
--H2	Base de datos embebida en memoria
--Docker	Containerización de los servicios
--JUnit & Mockito	Pruebas unitarias e integración
+-Spring Web / JPA	REST APIs y persistencia
+-H2	Base de datos embebida
+-Docker	Containerización
+-JUnit + Mockito	Pruebas unitarias e integración
+-Spring Actuator	Health checks de los microservicios
+-Logback + Logstash	Logs estructurados en formato JSON
 
- Instalación y Ejecución
+                  Instalación y Ejecución
+-Requisitos
 
-Prerrequisitos
 Java 17+
 
 Docker
 
-IntelliJ IDEA
+Maven
+
+IntelliJ IDEA (recomendado)
 
 Clonar el repositorio
+
 bash
 
 git clone https://github.com/mpinzonxiqu/FullStackJavaSprintBoot.git
-
-
-
-Acceso a las APIs
-
-Productos: http://localhost:8080/api/productos
-
-Inventario: http://localhost:8080/api/inventory/crear
-
-
-compra : http://localhost:8080/api/inventory/purchase
-
-
-Listado Productos : http://localhost:8080/api/productos
-
-Listado Productos ID: http://localhost:8080/api/productos/1
-
-
-   Endpoints
-
-Productos
-
-Método	Endpoint	Descripción
-
-GET	/api/products	Listar productos
-
-GET	/api/products/{id}	Obtener producto por ID
-
-POST	/api/products	Crear nuevo producto
-
-
-
-Inventario
-
-
-Método	Endpoint	Descripción
-GET	/api/inventory/{id}	Obtener cantidad por producto
-
-PUT	/api/inventory/{id}	Actualizar cantidad disponible
-
-POST	/api/purchase	Comprar producto y descontar inventario
-
-Flujo de Compra
-Cliente envía product_id y cantidad al endpoint de compra (/api/purchase).
-
-El microservicio de inventario:
-
-Verifica la existencia del producto mediante solicitud al microservicio de productos.
-
-Consulta si hay cantidad suficiente en stock.
-
-Descuenta la cantidad del inventario y responde con la información completa de la compra.
-
- Este endpoint fue implementado en el microservicio de Inventario, ya que es el responsable de validar y modificar el stock.
-
-
-
-Ejecutar pruebas con:
+cd FullStackJavaSprintBoot
+Ejecutar ambos servicios con Docker
 
 bash
 
-mvn test
+docker-compose up --build
+Esto inicia los microservicios en localhost:8080
+
+                       Acceso a las APIs
+Servicio	Endpoint
+
+Productos	http://localhost:8080/api/productos
 
 
-📌 Decisiones Técnicas
-H2 Database fue utilizada por simplicidad, velocidad de desarrollo y facilidad de pruebas.
+Inventario	http://localhost:8080/api/inventory/crear
 
-Endpoint de compra se colocó en Inventario para seguir principios de responsabilidad única.
 
-JSON:API fue usado para mantener consistencia y facilitar interoperabilidad.
+Compra	http://localhost:8080/api/inventory/purchase
 
-📝 Documentación de la API
+                            Endpoints
+Productos  
 
-Swagger UI habilitado por defecto en:
 
-http://localhost:8080/swagger-ui/index.html
+Método	Ruta	Descripción
 
-También se incluye una colección de Postman en docs/postman_collection.json.
 
-📅 Entrega
-✨ Autor : Moises Pinzon Xiques 
+GET	/api/products	Listar productos
 
+GET	/api/products/{id}	Obtener por ID
+
+POST	/api/products	Crear nuevo producto
+
+                          Inventario
+Método	Ruta	Descripción 
+
+GET	/api/inventory/{id}	Consultar inventario
+PUT	/api/inventory/{id}	Actualizar stock
+POST	/api/purchase	Comprar producto y descontar stock
+
+                       Flujo de Compra
+
+
+Cliente envía product_id y cantidad al endpoint /api/purchase.
+
+El microservicio de Inventario:
+
+Consulta si el producto existe en el microservicio de Productos.
+
+Verifica stock disponible.
+
+Descuenta inventario.
+
+Retorna la información de la compra.
+
+ Este endpoint fue implementado en el microservicio de Inventario, siguiendo el principio de responsabilidad única.
+
+ -                        Mejoras Agregadas (Nivel Senior)
+Mejora	Descripción
+- Autenticación con API Key	Seguridad en llamadas internas.
+🩺 Health Checks	Activados con Spring Boot Actuator en /actuator/health y /actuator/info.
+- Docker optimizado	Multi-stage build en Dockerfile para imágenes más ligeras.
+-Logs estructurados	Configurado logback-spring.xml con encoder JSON (logstash).
+🧪 Cobertura de pruebas	JaCoCo configurado con +80% de cobertura. Reportes en target/site/jacoco.
+🧩 Configuración modular	Interceptor registrado en WebConfig sin alterar controladores.
+
+🧪 *Pruebas
+
+mvn clean test
+-Revisión del reporte de cobertura con JaCoCo:
+
+
+open target/site/jacoco/index.html
+
+🛠️ Documentación de la API
+Swagger UI: http://localhost:8080/swagger-ui/index.html
+
+Postman Collection: /docs/postman_collection.json
+
+🧠 Decisiones Técnicas
+API Key entre microservicios por simplicidad, seguridad y bajo acoplamiento.
+
+H2 Database: ligera y fácil de usar para pruebas rápidas.
+
+Compra en Inventario: siguiendo SRP, validación y modificación de stock deben ir en el servicio responsable de inventario.
+
+
+Generar esqueleto de interceptores.
+
+Optimizar Dockerfile.
+
+Generar configuración de logs.
+
+Asegurar el cumplimiento del estándar JSON:API.
+
+
+
+Entrega
+✨ Autor: Moises Pinzon Xiques
 Backend Developer – Java Spring Boot
+
+
